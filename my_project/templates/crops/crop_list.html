@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}作物一覧{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>作物一覧</h2>
+    </div>
+    <div class="col text-end">
+        <a href="{% url 'crops:crop_add' %}" class="btn btn-primary">新規作物登録</a>
+    </div>
+</div>
+
+<div class="row">
+    {% for crop in crops %}
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">{{ crop.name }}</h5>
+                    <h6 class="card-subtitle mb-2 text-muted">品種: {{ crop.variety }}</h6>
+                    <p class="card-text">
+                        <small>播種日: {{ crop.planting_date }}</small><br>
+                        <small>収穫予定日: {{ crop.expected_harvest_date }}</small><br>
+                        <span class="badge bg-info">{{ crop.get_current_stage_display }}</span>
+                    </p>
+                    <a href="{% url 'crops:crop_detail' crop.id %}" class="btn btn-outline-primary btn-sm">詳細</a>
+                    <form method="POST" action="{% url 'delete_crop' crop.id %}" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('この作物を削除してもよろしいですか？')">
+                            削除
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    {% empty %}
+        <div class="col">
+            <p class="text-center">登録されている作物はありません。</p>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %} 

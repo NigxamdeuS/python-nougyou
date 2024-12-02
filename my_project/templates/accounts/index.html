@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block title %}ホーム{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated %}
+    <div class="row mb-4">
+        <div class="col">
+            <h2>ダッシュボード</h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 作物の概要 -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">栽培中の作物</h5>
+                    <a href="{% url 'crops:crop_list' %}" class="btn btn-sm btn-outline-primary">全て表示</a>
+                </div>
+                <div class="card-body">
+                    {% for crop in recent_crops %}
+                        <div class="mb-3 pb-2 border-bottom">
+                            <h6>{{ crop.name }} ({{ crop.variety }})</h6>
+                            <p class="mb-1">
+                                <small>播種日: {{ crop.planting_date }}</small><br>
+                                <small>収穫予定: {{ crop.expected_harvest_date }}</small>
+                            </p>
+                            <span class="badge bg-info">{{ crop.get_current_stage_display }}</span>
+                        </div>
+                    {% empty %}
+                        <p class="text-center">栽培中の作物はありません。</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- 在庫状況 -->
+        <div class="col-md-6 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">在庫状況</h5>
+                    <a href="{% url 'crops:inventory_list' %}" class="btn btn-sm btn-outline-primary">在庫管理</a>
+                </div>
+                <div class="card-body">
+                    {% for item in low_stock_items %}
+                        <div class="mb-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <span>{{ item.name }}</span>
+                                <span class="badge bg-warning text-dark">残り {{ item.quantity }} {{ item.unit }}</span>
+                            </div>
+                            <form method="POST" action="{% url 'delete_inventory' item.id %}" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('この在庫を削除してもよろしいですか？')">
+                                    削除
+                                </button>
+                            </form>
+                        </div>
+                    {% empty %}
+                        <p class="text-center">在庫の登録がありません。</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- 最近の収穫記録 -->
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">最近の収穫記録</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>作物</th>
+                                    <th>収穫日</th>
+                                    <th>収穫量</th>
+                                    <th>収益</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for harvest in recent_harvests %}
+                                    <tr>
+                                        <td>{{ harvest.crop.name }}</td>
+                                        <td>{{ harvest.harvest_date }}</td>
+                                        <td>{{ harvest.quantity }} {{ harvest.unit }}</td>
+                                        <td>{{ harvest.revenue }}円</td>
+                                    </tr>
+                                {% empty %}
+                                    <tr>
+                                        <td colspan="4" class="text-center">収穫記録はありません。</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="text-center py-5">
+        <h1>玉谷農業管理システムへようこそ</h1>
+        <p class="lead">作物の管理、収穫記録、在庫管理を簡単に行えます。</p>
+        <div class="mt-4">
+            <a href="{% url 'login' %}" class="btn btn-primary me-2">ログイン</a>
+            <a href="{% url 'register' %}" class="btn btn-success">新規登録</a>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

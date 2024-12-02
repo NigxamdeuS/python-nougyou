@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% load widget_tweaks %}
+
+{% block title %}{% if is_edit %}作物編集{% else %}作物登録{% endif %}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <h2 class="mb-4">{% if is_edit %}作物編集{% else %}作物登録{% endif %}</h2>
+        <form method="post">
+            {% csrf_token %}
+            {% for field in form %}
+                <div class="mb-3">
+                    <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                    {{ field.errors }}
+                    {{ field|add_class:"form-control" }}
+                    {% if field.help_text %}
+                        <small class="form-text text-muted">{{ field.help_text }}</small>
+                    {% endif %}
+                </div>
+            {% endfor %}
+            <button type="submit" class="btn btn-primary">
+                {% if is_edit %}更新{% else %}登録{% endif %}
+            </button>
+            <a href="{% url 'crops:crop_list' %}" class="btn btn-secondary">戻る</a>
+        </form>
+    </div>
+</div>
+{% endblock %} 

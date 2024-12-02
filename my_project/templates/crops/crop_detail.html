@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ crop.name }} - 詳細{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>{{ crop.name }} <small class="text-muted">{{ crop.variety }}</small></h2>
+    </div>
+    <div class="col text-end">
+        <a href="{% url 'crops:crop_edit' crop.id %}" class="btn btn-warning">編集</a>
+        <a href="{% url 'crops:growth_record_add' crop.id %}" class="btn btn-success">生育記録追加</a>
+        <a href="{% url 'crops:harvest_add' crop.id %}" class="btn btn-primary">収穫記録</a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                基本情報
+            </div>
+            <div class="card-body">
+                <p><strong>播種日:</strong> {{ crop.planting_date }}</p>
+                <p><strong>収穫予定日:</strong> {{ crop.expected_harvest_date }}</p>
+                <p><strong>現在の生育段階:</strong> 
+                    <span class="badge bg-info">{{ crop.get_current_stage_display }}</span>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card mb-4">
+            <div class="card-header">
+                生育記録
+            </div>
+            <div class="card-body">
+                {% for record in growth_records %}
+                    <div class="mb-3 pb-3 border-bottom">
+                        <div class="d-flex justify-content-between">
+                            <h6>{{ record.date }}</h6>
+                        </div>
+                        {% if record.photo %}
+                            <img src="{{ record.photo.url }}" class="img-fluid mb-2" style="max-height: 200px;">
+                        {% endif %}
+                        <p class="mb-0">{{ record.notes }}</p>
+                    </div>
+                {% empty %}
+                    <p class="text-center">生育記録はまだありません。</p>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                収穫記録
+            </div>
+            <div class="card-body">
+                {% for harvest in harvests %}
+                    <div class="mb-3 pb-3 border-bottom">
+                        <h6>{{ harvest.harvest_date }}</h6>
+                        <p>
+                            収穫量: {{ harvest.quantity }} {{ harvest.unit }}<br>
+                            収益: {{ harvest.revenue }}円
+                        </p>
+                        {% if harvest.notes %}
+                            <p class="mb-0"><small>{{ harvest.notes }}</small></p>
+                        {% endif %}
+                    </div>
+                {% empty %}
+                    <p class="text-center">収穫記録はまだありません。</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
